@@ -48,11 +48,17 @@ jobs:
 
   sonar-scan:
     runs-on: ubuntu-latest
+    needs: test
+
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@d08d592c0b694607865c089cba90bbf87c9a6d89
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_PROJECT_KEY: nabiilahputri13_willowstretch-be
           SONAR_ORGANIZATION: nabiilahputri13
+
 
