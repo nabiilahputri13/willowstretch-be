@@ -23,7 +23,20 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Django checks
+      - name: Run lint (ruff)
+        run: |
+          ruff check .
+
+      - name: Run type check (mypy)
+        env:
+          DJANGO_SETTINGS_MODULE: config.settings
+          SECRET_KEY: test-secret-key
+          DEBUG: False
+          ALLOWED_HOSTS: localhost
+        run: |
+          mypy .
+
+      - name: Run Django checks & tests
         env:
           SECRET_KEY: test-secret-key
           DEBUG: False
