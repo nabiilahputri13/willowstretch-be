@@ -5,24 +5,23 @@ ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
 
-# 1. Bikin user baru
+# 1. Bikin user dulu
 RUN useradd -m putri
 
-# 2. Copy requirements dulu (sebagai root, tapi nanti bisa dibaca semua)
+# 2. Copy requirements (Ini aman pakai root sebentar)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 3. COPY kodingan dengan mode READ-ONLY (555)
-# Ini membereskan pesan "no write permissions are assigned"
-COPY --chown=putri:putri --chmod=555 . .
+# 3. AMBIL HANYA YANG PERLU (Menjawab "Copying recursively")
+# Ganti 'core', 'config', dll dengan nama folder project Django kamu
+COPY --chown=putri:putri --chmod=555 manage.py .
+COPY --chown=putri:putri --chmod=555 core/ ./core/
+COPY --chown=putri:putri --chmod=555 config/ ./config/
 
-# 4. KECUALI untuk folder/file yang butuh nulis (seperti folder log atau DB sqlite)
-# Kalau kamu pakai sqlite, user 'putri' butuh izin tulis ke folder /app dan file db
-RUN chmod 755 /app && \
-    touch /app/db.sqlite3 && \
-    chown putri:putri /app/db.sqlite3 && \
-    chmod 664 /app/db.sqlite3
+# 4. Buat folder untuk file statis/media yang butuh izin tulis (Jika perlu)
+RUN mkdir -p /app/staticfiles && chown putri:putri /app/staticfiles
 
+# 5. Pindah ke user putri
 USER putri
 
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
