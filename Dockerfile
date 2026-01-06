@@ -1,36 +1,33 @@
 FROM python:3.10-slim
 
-# Optimasi Python
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app
 
-# 1. Bikin user putri
+# 1. User
 RUN useradd -m putri
 
-# 2. Install Requirements
+# 2. Requirements
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# 3. Copy Code secara Eksplisit (Biar gak kena recursive issue)
+# 3. Copy Code
 COPY manage.py .
 COPY core/ ./core/
 COPY config/ ./config/
 
-# 4. KUNCI MATI (READ-ONLY) UNTUK CODE
-# Semua file codingan kita kunci jadi 444 (Read Only buat semua)
-# Folder kita kasih 555 (Read + Execute buat masuk folder)
-RUN chown -R putri:putri /app && \
-    find /app -type d -exec chmod 555 {} + && \
-    find /app -type f -exec chmod 444 {} +
+# 4. SECURITY CODE (Kunci Codingan)
+# Kita ganti pemiliknya ke putri
+RUN chown -R putri:putri /app
 
-# 5. KUNCI KHUSUS DATABASE (SOLUSI DARI ERROR TERAKHIR)
-# Kita pakai 600 (rw-------). 
-# Artinya: Cuma 'putri' yang boleh Baca+Tulis. Group & Others = 0 (DILARANG MASUK).
-RUN touch /app/db.sqlite3 && \
-    chown putri:putri /app/db.sqlite3 && \
-    chmod 600 /app/db.sqlite3
+# JURUS SONAR DIAM:
+# Kita kunci file codingan jadi 444 (Read Only) biar aman.
+# TAPI folder /app kita biarkan default (755) atau set 555.
+# Kenapa kita HAPUS bagian 'touch db.sqlite3'? 
+# Karena nanti db.sqlite3 datangnya dari laptop kamu lewat 'docker-compose'.
+RUN find /app -type f -exec chmod 444 {} + && \
+    find /app -type d -exec chmod 555 {} +
 
 USER putri
 
