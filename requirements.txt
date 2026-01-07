@@ -1,13 +1,17 @@
 asgiref==3.11.0
 Django==4.2.27
+django-cors-headers==4.9.0
 django-stubs==5.2.8
 django-stubs-ext==5.2.8
+djangorestframework==3.16.1
+djangorestframework_simplejwt==5.5.1
 librt==0.7.7
 mypy==1.19.1
 mypy_extensions==1.1.0
 pathspec==0.12.1
 psycopg==3.3.2
 psycopg-binary==3.3.2
+PyJWT==2.10.1
 python-dotenv==1.2.1
 ruff==0.14.10
 sqlparse==0.5.5
