@@ -1,0 +1,10 @@
+[tool.mypy]
+django_settings_module = "config.settings"
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "rest_framework.*",
+    "jwt.*",
+]
+ignore_missing_imports = true
