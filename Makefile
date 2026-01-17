@@ -32,11 +32,15 @@ test:
 	@echo "Running tests..."
 	pytest
 
-lint:
+fix:
 	@echo "Fixing lint errors..."
 	ruff check . --fix
 	@echo "Formatting code..."
 	ruff format .
+
+lint:
+	@echo "🧹 Cleaning MyPy cache..."
+	rm -rf .mypy_cache
 	@echo "Running linter and type checker..."
 	ruff check .
 	mypy .

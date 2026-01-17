@@ -11,7 +11,7 @@ class CookieJWTAuthentication(JWTAuthentication):
         if not raw_token:
             return None
         try:
-            validated_token = self.get_validated_token(raw_token)
+            validated_token = self.get_validated_token(raw_token.encode("utf-8"))
         except (InvalidToken, TokenError, AuthenticationFailed):
             return None
         return self.get_user(validated_token), validated_token
