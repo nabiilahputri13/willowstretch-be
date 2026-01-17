@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "core",
     "users",
+    "classes",
 ]
 
 MIDDLEWARE = [
@@ -150,9 +151,19 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    )
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'users.authentication.CookieJWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
 }
 
 AUTH_USER_MODEL = "users.User"
+
+from datetime import timedelta
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60), # Token berlaku 1 jam
+    'SIGNING_KEY': SECRET_KEY, # Pakai kunci rahasia Django
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
