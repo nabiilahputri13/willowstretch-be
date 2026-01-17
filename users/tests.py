@@ -30,7 +30,7 @@ class AuthIntegrationTest(APITestCase):
         self.assertEqual(login_response.status_code, status.HTTP_200_OK)
 
         # Pastikan set_cookie 'jwt' berhasil
-        self.assertIn("jwt", login_response.cookies)
+        self.assertIn("access_token", login_response.cookies)
 
     def test_login_invalid_user(self):
         """Tes login dengan user yang tidak terdaftar"""
@@ -58,4 +58,4 @@ class AuthIntegrationTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["message"], "Logout Berhasil")
         # Cek apakah cookie jwt sudah kosong/terhapus
-        self.assertEqual(response.cookies["jwt"].value, "")
+        response.cookies["access_token"].value, ""
