@@ -1,13 +1,9 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework.exceptions import AuthenticationFailed
-from .serializers import UserSerializer
-from .models import User
-import datetime
-import jwt
-from rest_framework import status
 from django.contrib.auth import authenticate
+from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+
+from .serializers import UserSerializer
 
 
 class RegisterView(APIView):
@@ -26,33 +22,31 @@ class LoginView(APIView):
         user = authenticate(email=email, password=password)
 
         if user is None:
-            return Response({'error': 'Email/Password salah'}, status=401)
+            return Response({"error": "Email/Password salah"}, status=401)
 
         # GENERATE TOKEN PAKAI SIMPLEJWT
         refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token) # Ini token masuknya
+        access_token = str(refresh.access_token)  # Ini token masuknya
 
         response = Response()
-        
+
         # Simpan di Cookie dengan nama 'access_token' (sesuai authentication.py)
         response.set_cookie(
-            key="access_token", 
-            value=access_token, 
+            key="access_token",
+            value=access_token,
             httponly=True,
-            samesite='Lax',
-            secure=False # Ubah True kalau production (HTTPS)
+            samesite="Lax",
+            secure=False,  # Ubah True kalau production (HTTPS)
         )
-        
-        response.data = {
-            "message": "Login Berhasil!", 
-            "is_admin": user.is_admin
-        }
+
+        response.data = {"message": "Login Berhasil!", "is_admin": user.is_admin}
         return response
+
 
 class LogoutView(APIView):
     def post(self, request):
         response = Response()
         # Hapus cookie yang namanya 'access_token'
-        response.delete_cookie("access_token") 
+        response.delete_cookie("access_token")
         response.data = {"message": "Logout Berhasil"}
         return response

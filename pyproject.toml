@@ -1,10 +1,49 @@
+[tool.ruff]
+# Panjang baris maksimal agar tidak bentrok dengan linter
+line-length = 120
+exclude = ["migrations", "env", "venv", "__pycache__"]
+
+[tool.ruff.lint]
+# E: Error, F: Pyflakes, I: Isort (Import sorting)
+select = ["E", "F", "I"]
+ignore = []
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "config.settings"
+python_files = ["tests.py", "test_*.py", "*_tests.py"]
+
 [tool.mypy]
-django_settings_module = "config.settings"
+# Konfigurasi dasar MyPy
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
 ignore_missing_imports = true
+# Mencegah MyPy minta anotasi tipe data pada variabel model Django
+disallow_untyped_defs = false
+check_untyped_defs = false
+
+# Folder yang diabaikan
+exclude = [
+    "migrations",
+    "env",
+    "venv",
+    "__pycache__",
+    "manage.py"
+]
+
+# Cara penulisan plugin yang benar (berbentuk list)
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+# Konfigurasi khusus plugin django-stubs
+django_settings_module = "config.settings"
 
 [[tool.mypy.overrides]]
+# Mengabaikan error library pihak ketiga yang tidak punya typing
 module = [
     "rest_framework.*",
     "jwt.*",
+    "dotenv.*",
+    "django_rest_framework.*"
 ]
 ignore_missing_imports = true

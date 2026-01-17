@@ -1,22 +1,26 @@
 from rest_framework import generics, permissions
+
+from users.permissions import IsAdmin
+
 from .models import YogaClass
 from .serializers import YogaClassSerializer
-from users.permissions import IsAdmin  
+
 
 class YogaClassListCreateAPI(generics.ListCreateAPIView):
-    queryset = YogaClass.objects.all().order_by('start_at')
+    queryset = YogaClass.objects.all().order_by("start_at")
     serializer_class = YogaClassSerializer
 
     def get_permissions(self):
-        if self.request.method == 'POST':
+        if self.request.method == "POST":
             return [IsAdmin()]
         return [permissions.AllowAny()]
+
 
 class YogaClassDetailUpdateDeleteAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = YogaClass.objects.all()
     serializer_class = YogaClassSerializer
 
     def get_permissions(self):
-        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
+        if self.request.method in ["PUT", "PATCH", "DELETE"]:
             return [IsAdmin()]
         return [permissions.AllowAny()]
