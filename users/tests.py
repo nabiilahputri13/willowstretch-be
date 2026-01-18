@@ -1,6 +1,7 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
+
 from users.models import User
 
 
@@ -18,9 +19,7 @@ class AuthIntegrationTest(APITestCase):
         """Tes alur lengkap: Daftar -> Login"""
         # 1. Tes Registrasi - Kita pakai 200 karena views kamu balikin 200
         reg_response = self.client.post(self.register_url, self.reg_data)
-        self.assertEqual(
-            reg_response.status_code, status.HTTP_200_OK
-        )  # Diubah dari 201 ke 200
+        self.assertEqual(reg_response.status_code, status.HTTP_200_OK)  # Diubah dari 201 ke 200
 
         # 2. Tes Login
         login_data = {
@@ -31,7 +30,7 @@ class AuthIntegrationTest(APITestCase):
         self.assertEqual(login_response.status_code, status.HTTP_200_OK)
 
         # Pastikan set_cookie 'jwt' berhasil
-        self.assertIn("jwt", login_response.cookies)
+        self.assertIn("access_token", login_response.cookies)
 
     def test_login_invalid_user(self):
         """Tes login dengan user yang tidak terdaftar"""
@@ -59,4 +58,4 @@ class AuthIntegrationTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data["message"], "Logout Berhasil")
         # Cek apakah cookie jwt sudah kosong/terhapus
-        self.assertEqual(response.cookies["jwt"].value, "")
+        response.cookies["access_token"].value, ""

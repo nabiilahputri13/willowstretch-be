@@ -1,10 +1,9 @@
-from rest_framework.views import APIView
+from django.contrib.auth import authenticate
 from rest_framework.response import Response
-from rest_framework.exceptions import AuthenticationFailed
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+
 from .serializers import UserSerializer
-from .models import User
-import datetime
-import jwt
 
 
 class RegisterView(APIView):
@@ -17,32 +16,29 @@ class RegisterView(APIView):
 
 class LoginView(APIView):
     def post(self, request):
-        email = request.data["email"]
-        password = request.data["password"]
+        email = request.data.get("email")
+        password = request.data.get("password")
 
-        user = User.objects.filter(email=email).first()
+        user = authenticate(email=email, password=password)
 
         if user is None:
-            raise AuthenticationFailed("User tidak ketemu!")
+            return Response({"error": "Email/Password salah"}, status=401)
 
-        if not user.check_password(password):
-            raise AuthenticationFailed("Password salah!")
-
-        # Payload: Isi dari kartu identitas (token)
-        payload = {
-            "id": user.id,
-            "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
-            "iat": datetime.datetime.utcnow(),
-        }
-
-        token = jwt.encode(payload, "secret", algorithm="HS256")
+        # GENERATE TOKEN PAKAI SIMPLEJWT
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)  # Ini token masuknya
 
         response = Response()
 
-        # SIMPAN TOKEN DI COOKIE
+        # Simpan di Cookie dengan nama 'access_token' (sesuai authentication.py)
         response.set_cookie(
-            key="jwt", value=token, httponly=True
-        )  # httponly biar aman dari hacker
+            key="access_token",
+            value=access_token,
+            httponly=True,
+            samesite="Lax",
+            secure=False,  # Ubah True kalau production (HTTPS)
+        )
+
         response.data = {"message": "Login Berhasil!", "is_admin": user.is_admin}
         return response
 
@@ -50,6 +46,7 @@ class LoginView(APIView):
 class LogoutView(APIView):
     def post(self, request):
         response = Response()
-        response.delete_cookie("jwt")
+        # Hapus cookie yang namanya 'access_token'
+        response.delete_cookie("access_token")
         response.data = {"message": "Logout Berhasil"}
         return response

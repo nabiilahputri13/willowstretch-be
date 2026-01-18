@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import User
 
 
@@ -6,9 +7,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "username", "email", "password", "is_admin"]
-        extra_kwargs = {
-            "password": {"write_only": True}
-        }  # Password gak boleh dipamerin/dibaca
+        extra_kwargs = {"password": {"write_only": True}}  # Password gak boleh dipamerin/dibaca
 
     def create(self, validated_data):
         # Hash password biar gak kebaca orang
