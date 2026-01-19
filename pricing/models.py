@@ -1,7 +1,8 @@
 from django.db import models
 
+
 class Package(models.Model):
-    name = models.CharField(max_length=100) # Misal: "Starter Pack", "Monthly Unlimited"
+    name = models.CharField(max_length=100)  # Misal: "Starter Pack", "Monthly Unlimited"
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     credits = models.PositiveIntegerField(help_text="Berapa banyak sesi yoga yang didapat?")
@@ -10,6 +11,7 @@ class Package(models.Model):
 
     def __str__(self):
         return f"{self.name} - Rp{self.price}"
+
 
 class UserSubscription(models.Model):
     # Menghubungkan paket yang dibeli dengan user
@@ -25,4 +27,5 @@ class UserSubscription(models.Model):
     @property
     def is_active(self):
         from django.utils import timezone
+
         return self.remaining_credits > 0 and self.expired_at > timezone.now()

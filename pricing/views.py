@@ -1,12 +1,15 @@
-from rest_framework import generics, views, status, permissions
-from rest_framework.response import Response
+from datetime import timedelta
+
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
-from datetime import timedelta
+from rest_framework import generics, permissions, status, views
+from rest_framework.response import Response
+
+from users.permissions import IsAdmin  # Permission custom kamu
 
 from .models import Package, UserSubscription
 from .serializers import PackageSerializer, UserSubscriptionSerializer
-from users.permissions import IsAdmin  # Permission custom kamu
+
 
 # 1. List & Create Package (Admin only create, Public read)
 class PackageListCreateAPI(generics.ListCreateAPIView):
@@ -18,11 +21,13 @@ class PackageListCreateAPI(generics.ListCreateAPIView):
             return [IsAdmin()]  # Cuma Admin boleh bikin harga
         return [permissions.AllowAny()]  # User biasa boleh liat harga
 
+
 # 2. Detail Package (Update/Delete Admin Only)
 class PackageDetailAPI(generics.RetrieveUpdateDestroyAPIView):
     queryset = Package.objects.all()
     serializer_class = PackageSerializer
     permission_classes = [IsAdmin]
+
 
 # 3. Buy Package (Simulasi Pembelian)
 class BuyPackageAPI(views.APIView):
@@ -38,17 +43,12 @@ class BuyPackageAPI(views.APIView):
 
         # Buat Subscription baru buat user
         subscription = UserSubscription.objects.create(
-            user=user,
-            package=package,
-            remaining_credits=package.credits,
-            expired_at=expiry_date
+            user=user, package=package, remaining_credits=package.credits, expired_at=expiry_date
         )
 
         serializer = UserSubscriptionSerializer(subscription)
-        return Response({
-            "message": "Paket berhasil dibeli!",
-            "data": serializer.data
-        }, status=status.HTTP_201_CREATED)
+        return Response({"message": "Paket berhasil dibeli!", "data": serializer.data}, status=status.HTTP_201_CREATED)
+
 
 # 4. Lihat Subscription Saya
 class MySubscriptionListAPI(generics.ListAPIView):
@@ -57,4 +57,4 @@ class MySubscriptionListAPI(generics.ListAPIView):
 
     def get_queryset(self):
         # Filter cuma punya user yang login
-        return UserSubscription.objects.filter(user=self.request.user).order_by('-bought_at')
+        return UserSubscription.objects.filter(user=self.request.user).order_by("-bought_at")
