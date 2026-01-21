@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .serializers import UserSerializer
+from .serializers import UserSerializer  # Import serializer yang tadi dibuat
 
 
 class RegisterView(APIView):
@@ -24,29 +24,35 @@ class LoginView(APIView):
         if user is None:
             return Response({"error": "Email/Password salah"}, status=401)
 
-        # GENERATE TOKEN PAKAI SIMPLEJWT
+        # GENERATE TOKEN
         refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)  # Ini token masuknya
+        access_token = str(refresh.access_token)
 
         response = Response()
 
-        # Simpan di Cookie dengan nama 'access_token' (sesuai authentication.py)
+        # 1. Set Cookie (Hanya bisa dibaca server, aman dari XSS)
         response.set_cookie(
             key="access_token",
             value=access_token,
             httponly=True,
             samesite="Lax",
-            secure=False,  # Ubah True kalau production (HTTPS)
+            secure=False,  # Ubah True jika pakai HTTPS (Production)
         )
 
-        response.data = {"message": "Login Berhasil!", "is_admin": user.is_admin}
+        # 2. Serialize User Data
+        # Ini langkah penting agar Frontend tahu dia Admin atau bukan
+        user_data = UserSerializer(user).data
+
+        # 3. Return Response Body
+        # Kita kirim token juga di body untuk State Management (Pinia)
+        response.data = {"message": "Login Berhasil!", "access": access_token, "user": user_data}
+
         return response
 
 
 class LogoutView(APIView):
     def post(self, request):
         response = Response()
-        # Hapus cookie yang namanya 'access_token'
         response.delete_cookie("access_token")
         response.data = {"message": "Logout Berhasil"}
         return response
