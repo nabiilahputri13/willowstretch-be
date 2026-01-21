@@ -2,7 +2,9 @@ from django.contrib.auth import authenticate
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import UserSerializer # Import serializer yang tadi dibuat
+
+from .serializers import UserSerializer  # Import serializer yang tadi dibuat
+
 
 class RegisterView(APIView):
     def post(self, request):
@@ -10,6 +12,7 @@ class RegisterView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
 
 class LoginView(APIView):
     def post(self, request):
@@ -42,13 +45,10 @@ class LoginView(APIView):
 
         # 3. Return Response Body
         # Kita kirim token juga di body untuk State Management (Pinia)
-        response.data = {
-            "message": "Login Berhasil!",
-            "access": access_token, 
-            "user": user_data
-        }
-        
+        response.data = {"message": "Login Berhasil!", "access": access_token, "user": user_data}
+
         return response
+
 
 class LogoutView(APIView):
     def post(self, request):
