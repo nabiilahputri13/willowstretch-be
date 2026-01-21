@@ -25,3 +25,12 @@ class YogaClass(models.Model):
     @property
     def participant_count(self):
         return self.participants.count()
+
+
+class CancellationLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    yoga_class = models.ForeignKey(YogaClass, on_delete=models.CASCADE)
+    cancelled_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Log: {self.user.username} cancel {self.yoga_class.name}"
