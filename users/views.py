@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -56,3 +57,11 @@ class LogoutView(APIView):
         response.delete_cookie("access_token")
         response.data = {"message": "Logout Berhasil"}
         return response
+
+
+class UserProfileAPI(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = UserSerializer(request.user)
+        return Response(serializer.data)
