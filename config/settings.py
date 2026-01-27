@@ -137,3 +137,10 @@ SIMPLE_JWT = {
     "SIGNING_KEY": SECRET_KEY,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'Asia/Jakarta' 
+
+USE_I18N = True
+USE_TZ = True
