@@ -119,10 +119,7 @@ class MyJoinedClassesAPI(APIView):
                         "name": item.name,
                         "start_at": item.start_at,
                         "room": item.room,
-<<<<<<< HEAD
-=======
                         "instructor_name": item.instructor_name,
->>>>>>> 7c74584298107953bcb4abe4a3bc40d5841c84de
                         "status": "JOINED",  # Status Aktif
                     }
                 )
@@ -137,10 +134,7 @@ class MyJoinedClassesAPI(APIView):
                         "name": log.yoga_class.name,
                         "start_at": log.yoga_class.start_at,
                         "room": log.yoga_class.room,
-<<<<<<< HEAD
-=======
                         "instructor_name": log.instructor_name,
->>>>>>> 7c74584298107953bcb4abe4a3bc40d5841c84de
                         "status": "CANCELLED",  # Status Batal
                         "cancelled_at": log.cancelled_at,  # Ada tanggal cancel
                     }
