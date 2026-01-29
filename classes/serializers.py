@@ -22,14 +22,14 @@ class YogaClassSerializer(serializers.ModelSerializer):
             "participant_count",
             "is_full",
             "created_at",
-            "is_booked_by_user"
+            "is_booked_by_user",
         ]
         # Agar saat create kelas, kita ga dipaksa masukin participants
         extra_kwargs = {"participants": {"read_only": True}}
 
     def get_is_booked_by_user(self, obj):
         # Ambil user dari context request
-        request = self.context.get('request')
+        request = self.context.get("request")
         if request and request.user.is_authenticated:
             # Cek apakah user login ini ada di dalam participants kelas ini
             return obj.participants.filter(id=request.user.id).exists()

@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "users",
     "classes",
     "pricing",
+    "teachers",
 ]
 
 MIDDLEWARE = [
@@ -138,9 +139,12 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'Asia/Jakarta' 
+TIME_ZONE = "Asia/Jakarta"
 
 USE_I18N = True
 USE_TZ = True
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
