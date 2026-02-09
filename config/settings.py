@@ -2,6 +2,7 @@ import os
 import sys
 from datetime import timedelta
 from pathlib import Path
+
 import dj_database_url
 from dotenv import load_dotenv
 
@@ -17,14 +18,14 @@ IS_TESTING = "test" in sys.argv or any("pytest" in arg for arg in sys.argv)
 # ------------------------------------
 
 # SECRET_KEY = os.getenv("SECRET_KEY")
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-kunci-rahasia-buat-local-aja')
+SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-kunci-rahasia-buat-local-aja")
 if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY is not set")
 
 # DEBUG = os.getenv("DEBUG") == "True"
-DEBUG = 'RENDER' not in os.environ
+DEBUG = "RENDER" not in os.environ
 # ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",") if not DEBUG else []
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -39,7 +40,7 @@ INSTALLED_APPS = [
     "users",
     "classes",
     "pricing",
-    "teachers"
+    "teachers",
 ]
 
 MIDDLEWARE = [
@@ -85,13 +86,7 @@ if IS_GITHUB_ACTIONS or IS_TESTING:
         }
     }
 else:
-    DATABASES = {
-        "default": {
-            'default': dj_database_url.config(
-            default='sqlite:///db.sqlite3',
-            conn_max_age=600)
-        }
-    }
+    DATABASES = {"default": {"default": dj_database_url.config(default="sqlite:///db.sqlite3", conn_max_age=600)}}
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -137,12 +132,12 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'Asia/Jakarta' 
+TIME_ZONE = "Asia/Jakarta"
 
 USE_I18N = True
 USE_TZ = True
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
