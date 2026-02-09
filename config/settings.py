@@ -2,7 +2,7 @@ import os
 import sys
 from datetime import timedelta
 from pathlib import Path
-
+import dj_database_url
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -16,14 +16,15 @@ IS_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 IS_TESTING = "test" in sys.argv or any("pytest" in arg for arg in sys.argv)
 # ------------------------------------
 
-SECRET_KEY = os.getenv("SECRET_KEY")
+# SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-kunci-rahasia-buat-local-aja')
 if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY is not set")
 
-DEBUG = os.getenv("DEBUG") == "True"
-
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",") if not DEBUG else []
-
+# DEBUG = os.getenv("DEBUG") == "True"
+DEBUG = 'RENDER' not in os.environ
+# ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",") if not DEBUG else []
+ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -38,7 +39,7 @@ INSTALLED_APPS = [
     "users",
     "classes",
     "pricing",
-    "teachers",
+    "teachers"
 ]
 
 MIDDLEWARE = [
@@ -86,12 +87,9 @@ if IS_GITHUB_ACTIONS or IS_TESTING:
 else:
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME"),
-            "USER": os.getenv("DB_USER"),
-            "PASSWORD": os.getenv("DB_PASSWORD"),
-            "HOST": os.getenv("DB_HOST", "localhost"),
-            "PORT": os.getenv("DB_PORT", "5432"),
+            'default': dj_database_url.config(
+            default='sqlite:///db.sqlite3',
+            conn_max_age=600)
         }
     }
 
@@ -139,12 +137,12 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = "Asia/Jakarta"
+TIME_ZONE = 'Asia/Jakarta' 
 
 USE_I18N = True
 USE_TZ = True
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
