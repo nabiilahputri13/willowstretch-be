@@ -68,6 +68,11 @@ CSRF_TRUSTED_ORIGINS = [
     "https://willowstretch-be.vercel.app",
 ]
 
+SESSION_COOKIE_SAMESITE = 'None'  # Izinkan cookie nyebrang domain
+CSRF_COOKIE_SAMESITE = 'None'     # Izinkan token nyebrang domain
+SESSION_COOKIE_SECURE = True      # Wajib True karena pake HTTPS (Vercel)
+CSRF_COOKIE_SECURE = True         # Wajib True karena pake HTTPS (Vercel)
+
 ROOT_URLCONF = "config.urls"
 
 TEMPLATES = [
