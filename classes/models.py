@@ -10,7 +10,9 @@ class YogaClass(models.Model):
     duration_minutes = models.PositiveIntegerField(default=60)
     max_capacity = models.PositiveIntegerField()
     room = models.CharField(max_length=50)
-    participants = models.ManyToManyField(User, related_name="joined_classes", blank=True)
+    participants = models.ManyToManyField(
+        User, related_name="joined_classes", blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     # Biar nama kelasnya muncul enak dibaca di Admin

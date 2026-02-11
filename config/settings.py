@@ -19,7 +19,9 @@ IS_TESTING = "test" in sys.argv or any("pytest" in arg for arg in sys.argv)
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 # SECRET_KEY = os.getenv("SECRET_KEY")
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-kunci-rahasia-buat-local-aja")
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-kunci-rahasia-buat-local-aja"
+)
 if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY is not set")
 
@@ -79,56 +81,43 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-# if IS_GITHUB_ACTIONS or IS_TESTING:
-#     DATABASES = {
-#         "default": {
-#             "ENGINE": "django.db.backends.sqlite3",
-#             "NAME": BASE_DIR / "db.sqlite3_test",
-#         }
-#     }
-# else:
-#     DATABASES = {"default": {"default": dj_database_url.config(default="sqlite:///db.sqlite3", conn_max_age=600)}}
+# --- LOGIKA FINAL: 3 DUNIA (VERCEL, GITHUB, LAPTOP) ---
 
-# --- HARDCODE PAKSA BUAT LOKAL ---
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'willowstretch',
-#         'USER': 'willowstretch_user',
-#         'PASSWORD': 'password123',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
+# Cek variabel lingkungan
+IS_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+IN_VERCEL = os.getenv("VERCEL")
 
-# --- LOGIKA FINAL: VERCEL DETECTOR ---
-
-# Cek apakah kode ini jalan di server Vercel?
-IN_VERCEL = os.getenv("VERCEL") 
-
-if IN_VERCEL:
-    # 1. KONDISI VERCEL (Pake Neon) 🌍
-    # Vercel otomatis punya DATABASE_URL
+if IS_GITHUB_ACTIONS:
+    # 1. KONDISI GITHUB ACTIONS (ROBOT) 🤖
+    # Pake SQLite biar test-nya jalan & gak perlu install Postgres
     DATABASES = {
-        "default": dj_database_url.config(
-            default=os.environ.get("DATABASE_URL"),
-            conn_max_age=600,
-            ssl_require=True
-        )
-    }
-else:
-    # 2. KONDISI LAPTOP NAPUT (Pake Postgres Lokal) 🏠
-    # Laptop kamu GAK punya tanda 'VERCEL', jadi pasti masuk sini.
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'willowstretch',
-            'USER': 'willowstretch_user',
-            'PASSWORD': 'password123',
-            'HOST': 'localhost',
-            'PORT': '5432',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
+elif IN_VERCEL:
+    # 2. KONDISI VERCEL (PRODUCTION) 🌍
+    # Pake Neon (Pastikan Environment Variable DATABASE_URL sudah di-set di Vercel)
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.environ.get("DATABASE_URL"), conn_max_age=600, ssl_require=True
+        ) # type: ignore
+    }
+else:
+    # 3. KONDISI LAPTOP NAPUT (LOCAL) 🏠
+    # Pake Postgres lokal kamu yang udah ada isinya
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "willowstretch",
+            "USER": "willowstretch_user",
+            "PASSWORD": "password123",
+            "HOST": "localhost",
+            "PORT": "5432",
+        }
+    }
+
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",

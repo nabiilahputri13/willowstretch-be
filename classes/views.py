@@ -41,11 +41,16 @@ class JoinClassAPI(APIView):
 
         # 1. Cek apakah user sudah terdaftar di kelas ini
         if yoga_class.participants.filter(id=user.id).exists():
-            return Response({"error": "Kamu sudah terdaftar di kelas ini!"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Kamu sudah terdaftar di kelas ini!"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # 2. Cek kapasitas kelas
         if yoga_class.is_full:
-            return Response({"error": "Yah, kelas sudah penuh!"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Yah, kelas sudah penuh!"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         # 3. Cek Subscription (Punya kredit gak?)
         # Kita cari subscription yang punya sisa kredit DAN masa aktifnya belum lewat
@@ -61,7 +66,8 @@ class JoinClassAPI(APIView):
 
         if not active_sub:
             return Response(
-                {"error": "Kamu tidak punya kredit aktif. Silakan beli paket dulu!"}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "Kamu tidak punya kredit aktif. Silakan beli paket dulu!"},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         # 4. EKSEKUSI (Pakai Atomic Transaction)
@@ -85,7 +91,8 @@ class JoinClassAPI(APIView):
 
         except Exception:
             return Response(
-                {"error": "Terjadi kesalahan sistem saat memproses data."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"error": "Terjadi kesalahan sistem saat memproses data."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
 
@@ -124,7 +131,9 @@ class MyJoinedClassesAPI(APIView):
                     }
                 )
         if status_param == "cancelled" or status_param == "":
-            cancelled_qs = CancellationLog.objects.filter(user=user).select_related("yoga_class")
+            cancelled_qs = CancellationLog.objects.filter(user=user).select_related(
+                "yoga_class"
+            )
 
             # Masukkan ke list results
             for log in cancelled_qs:
@@ -164,7 +173,10 @@ class CancelClassAPI(APIView):
 
         # Kalau kurang dari 12 jam, LANGSUNG TOLAK.
         if hours_remaining < 12:
-            return Response({"error": "Maaf, pembatalan sudah ditutup."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Maaf, pembatalan sudah ditutup."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         # 3. PROSES CANCEL NORMAL (Karena waktu masih aman)
         try:
@@ -178,7 +190,11 @@ class CancelClassAPI(APIView):
                 yoga_class.participants.remove(user)
 
                 # Refund Kredit
-                active_sub = user.subscriptions.filter(expired_at__gt=timezone.now()).order_by("-expired_at").first()
+                active_sub = (
+                    user.subscriptions.filter(expired_at__gt=timezone.now())
+                    .order_by("-expired_at")
+                    .first()
+                )
 
                 remaining = 0
                 if active_sub:
@@ -187,7 +203,10 @@ class CancelClassAPI(APIView):
                     remaining = active_sub.remaining_credits
 
                 return Response(
-                    {"message": "Cancel berhasil! Kredit kamu sudah dikembalikan.", "remaining_credits": remaining},
+                    {
+                        "message": "Cancel berhasil! Kredit kamu sudah dikembalikan.",
+                        "remaining_credits": remaining,
+                    },
                     status=status.HTTP_200_OK,
                 )
 

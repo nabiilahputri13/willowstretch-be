@@ -15,5 +15,13 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserSubscription
-        fields = ["id", "package", "package_name", "remaining_credits", "expired_at", "bought_at", "is_active"]
+        fields = [
+            "id",
+            "package",
+            "package_name",
+            "remaining_credits",
+            "expired_at",
+            "bought_at",
+            "is_active",
+        ]
         read_only_fields = ["expired_at", "bought_at", "remaining_credits"]
