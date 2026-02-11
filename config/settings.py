@@ -16,6 +16,7 @@ load_dotenv(BASE_DIR / ".env")
 IS_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 IS_TESTING = "test" in sys.argv or any("pytest" in arg for arg in sys.argv)
 # ------------------------------------
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # SECRET_KEY = os.getenv("SECRET_KEY")
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-kunci-rahasia-buat-local-aja")
@@ -78,16 +79,56 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-if IS_GITHUB_ACTIONS or IS_TESTING:
+# if IS_GITHUB_ACTIONS or IS_TESTING:
+#     DATABASES = {
+#         "default": {
+#             "ENGINE": "django.db.backends.sqlite3",
+#             "NAME": BASE_DIR / "db.sqlite3_test",
+#         }
+#     }
+# else:
+#     DATABASES = {"default": {"default": dj_database_url.config(default="sqlite:///db.sqlite3", conn_max_age=600)}}
+
+# --- HARDCODE PAKSA BUAT LOKAL ---
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'willowstretch',
+#         'USER': 'willowstretch_user',
+#         'PASSWORD': 'password123',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
+# --- LOGIKA FINAL: VERCEL DETECTOR ---
+
+# Cek apakah kode ini jalan di server Vercel?
+IN_VERCEL = os.getenv("VERCEL") 
+
+if IN_VERCEL:
+    # 1. KONDISI VERCEL (Pake Neon) 🌍
+    # Vercel otomatis punya DATABASE_URL
     DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3_test",
-        }
+        "default": dj_database_url.config(
+            default=os.environ.get("DATABASE_URL"),
+            conn_max_age=600,
+            ssl_require=True
+        )
     }
 else:
-    DATABASES = {"default": {"default": dj_database_url.config(default="sqlite:///db.sqlite3", conn_max_age=600)}}
-
+    # 2. KONDISI LAPTOP NAPUT (Pake Postgres Lokal) 🏠
+    # Laptop kamu GAK punya tanda 'VERCEL', jadi pasti masuk sini.
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': 'willowstretch',
+            'USER': 'willowstretch_user',
+            'PASSWORD': 'password123',
+            'HOST': 'localhost',
+            'PORT': '5432',
+        }
+    }
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
