@@ -59,8 +59,14 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://willowstretch-fe.vercel.app",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://willowstretch-fe.vercel.app",  
+    "https://willowstretch-be.vercel.app",
+]
 
 ROOT_URLCONF = "config.urls"
 
