@@ -44,7 +44,20 @@ INSTALLED_APPS = [
     "classes",
     "pricing",
     "teachers",
+    "cloudinary",
+    "cloudinary_storage",
 ]
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'nama_cloud_kamu'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY', 'api_key_kamu'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', 'api_secret_kamu')
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
