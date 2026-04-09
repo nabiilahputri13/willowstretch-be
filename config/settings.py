@@ -16,9 +16,12 @@ load_dotenv(BASE_DIR / ".env")
 IS_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
 IS_TESTING = "test" in sys.argv or any("pytest" in arg for arg in sys.argv)
 # ------------------------------------
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # SECRET_KEY = os.getenv("SECRET_KEY")
-SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-kunci-rahasia-buat-local-aja")
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY", "django-insecure-kunci-rahasia-buat-local-aja"
+)
 if not SECRET_KEY:
     raise RuntimeError("SECRET_KEY is not set")
 
@@ -41,7 +44,20 @@ INSTALLED_APPS = [
     "classes",
     "pricing",
     "teachers",
+    "cloudinary",
+    "cloudinary_storage",
 ]
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'nama_cloud_kamu'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY', 'api_key_kamu'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', 'api_secret_kamu')
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -56,8 +72,19 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
+    "https://willowstretch-fe.vercel.app",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://willowstretch-fe.vercel.app",  
+    "https://willowstretch-be.vercel.app",
+]
+
+SESSION_COOKIE_SAMESITE = 'None'  # Izinkan cookie nyebrang domain
+CSRF_COOKIE_SAMESITE = 'None'     # Izinkan token nyebrang domain
+SESSION_COOKIE_SECURE = True      # Wajib True karena pake HTTPS (Vercel)
+CSRF_COOKIE_SECURE = True         # Wajib True karena pake HTTPS (Vercel)
 
 ROOT_URLCONF = "config.urls"
 
@@ -78,15 +105,42 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "config.wsgi.application"
 
-if IS_GITHUB_ACTIONS or IS_TESTING:
+# --- LOGIKA FINAL: 3 DUNIA (VERCEL, GITHUB, LAPTOP) ---
+
+# Cek variabel lingkungan
+IS_GITHUB_ACTIONS = os.getenv("GITHUB_ACTIONS") == "true"
+IN_VERCEL = os.getenv("VERCEL")
+
+if IS_GITHUB_ACTIONS:
+    # 1. KONDISI GITHUB ACTIONS (ROBOT) 🤖
+    # Pake SQLite biar test-nya jalan & gak perlu install Postgres
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3_test",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
+elif IN_VERCEL:
+    # 2. KONDISI VERCEL (PRODUCTION) 🌍
+    # Pake Neon (Pastikan Environment Variable DATABASE_URL sudah di-set di Vercel)
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=os.environ.get("DATABASE_URL"), conn_max_age=600, ssl_require=True
+        ) # type: ignore
+    }
 else:
-    DATABASES = {"default": {"default": dj_database_url.config(default="sqlite:///db.sqlite3", conn_max_age=600)}}
+    # 3. KONDISI LAPTOP NAPUT (LOCAL) 🏠
+    # Pake Postgres lokal kamu yang udah ada isinya
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": "willowstretch",
+            "USER": "willowstretch_user",
+            "PASSWORD": "password123",
+            "HOST": "localhost",
+            "PORT": "5432",
+        }
+    }
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -140,4 +194,4 @@ USE_I18N = True
 USE_TZ = True
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+MEDIA_ROOT = str(BASE_DIR / "media")

@@ -1,6 +1,11 @@
 from django.urls import path
 
-from .views import BuyPackageAPI, MySubscriptionListAPI, PackageDetailAPI, PackageListCreateAPI
+from .views import (
+    BuyPackageAPI,
+    MySubscriptionListAPI,
+    PackageDetailAPI,
+    PackageListCreateAPI,
+)
 
 urlpatterns = [
     # Admin & Public: Manajemen Paket

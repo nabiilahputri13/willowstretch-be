@@ -19,7 +19,9 @@ class AuthIntegrationTest(APITestCase):
         """Tes alur lengkap: Daftar -> Login"""
         # 1. Tes Registrasi - Kita pakai 200 karena views kamu balikin 200
         reg_response = self.client.post(self.register_url, self.reg_data)
-        self.assertEqual(reg_response.status_code, status.HTTP_200_OK)  # Diubah dari 201 ke 200
+        self.assertEqual(
+            reg_response.status_code, status.HTTP_200_OK
+        )  # Diubah dari 201 ke 200
 
         # 2. Tes Login
         login_data = {

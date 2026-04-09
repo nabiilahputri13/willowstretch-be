@@ -43,11 +43,17 @@ class BuyPackageAPI(views.APIView):
 
         # Buat Subscription baru buat user
         subscription = UserSubscription.objects.create(
-            user=user, package=package, remaining_credits=package.credits, expired_at=expiry_date
+            user=user,
+            package=package,
+            remaining_credits=package.credits,
+            expired_at=expiry_date,
         )
 
         serializer = UserSubscriptionSerializer(subscription)
-        return Response({"message": "Paket berhasil dibeli!", "data": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response(
+            {"message": "Paket berhasil dibeli!", "data": serializer.data},
+            status=status.HTTP_201_CREATED,
+        )
 
 
 # 4. Lihat Subscription Saya
@@ -57,4 +63,6 @@ class MySubscriptionListAPI(generics.ListAPIView):
 
     def get_queryset(self):
         # Filter cuma punya user yang login
-        return UserSubscription.objects.filter(user=self.request.user).order_by("-bought_at")
+        return UserSubscription.objects.filter(user=self.request.user).order_by(
+            "-bought_at"
+        )

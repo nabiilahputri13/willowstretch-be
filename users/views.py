@@ -46,7 +46,11 @@ class LoginView(APIView):
 
         # 3. Return Response Body
         # Kita kirim token juga di body untuk State Management (Pinia)
-        response.data = {"message": "Login Berhasil!", "access": access_token, "user": user_data}
+        response.data = {
+            "message": "Login Berhasil!",
+            "access": access_token,
+            "user": user_data,
+        }
 
         return response
 
